@@ -259,8 +259,6 @@ The work is split into parallel lanes with frozen interfaces between them, so pe
 - Dashboards, runbooks and the data dictionary.
 - Reading exchange docs and terms carefully (seriously, this project lives and dies by the fine print).
 
-If any of this sounds interesting, reach out to me (Brandon) and I'll point you to a good first ticket.
-
 ---
 
 ## Open questions
