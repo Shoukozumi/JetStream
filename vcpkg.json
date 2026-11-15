@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "tick-engine",
+  "version": "0.1.0",
+  "builtin-baseline": "5d4a3dc90c0b3773f3bac81bf41297b54328f471",
+  "dependencies": [
+    "boost-asio",
+    "boost-beast",
+    "openssl",
+    "simdjson",
+    "quill",
+    {
+      "name": "opentelemetry-cpp",
+      "features": [
+        "prometheus"
+      ]
+    },
+    "hdr-histogram",
+    "clickhouse-cpp"
+  ]
+}

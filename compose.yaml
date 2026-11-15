@@ -1,0 +1,98 @@
+name: tick-engine
+
+services:
+  dev:
+      build:
+        context: .
+        dockerfile: docker/Dockerfile
+        target: toolchain
+        args:
+          UID: ${UID:-1000}
+          GID: ${GID:-1000}
+      image: tick-engine/toolchain:local
+      working_dir: /workspace
+      volumes:
+        - .:/workspace
+        - vcpkg-cache:/var/cache/vcpkg
+        - ccache:/home/dev/.cache/ccache
+      environment:
+        CLICKHOUSE_HOST: clickhouse
+        CLICKHOUSE_PORT: "9000"
+        CLICKHOUSE_USER: ${CLICKHOUSE_USER:-engine}
+        CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      cap_add:
+        - SYS_PTRACE
+        - PERFMON
+      security_opt:
+        - seccomp:unconfined
+      ulimits:
+        core: -1
+      init: true
+      stdin_open: true
+      tty: true
+      depends_on:
+        clickhouse:
+          condition: service_healthy
+
+  clickhouse:
+      image: clickhouse/clickhouse-server:26.8
+      environment:
+        CLICKHOUSE_DB: market
+        CLICKHOUSE_USER: ${CLICKHOUSE_USER:-engine}
+        CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+        CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+      ports:
+        - "127.0.0.1:8123:8123"
+        - "127.0.0.1:9000:9000"
+      volumes:
+        - clickhouse-data:/var/lib/clickhouse
+        - clickhouse-logs:/var/log/clickhouse-server
+        - ./docker/clickhouse/initdb:/docker-entrypoint-initdb.d:ro
+      ulimits:
+        nofile:
+          soft: 262144
+          hard: 262144
+      cap_add:
+        - SYS_NICE
+        - IPC_LOCK
+      healthcheck:
+        test: ["CMD-SHELL", "clickhouse-client --user \"$$CLICKHOUSE_USER\" --password \"$$CLICKHOUSE_PASSWORD\" --query 'SELECT 1'"]
+        interval: 5s
+        timeout: 5s
+        retries: 30
+        start_period: 10s
+      restart: unless-stopped
+
+  prometheus:
+      image: prom/prometheus:latest
+      profiles: ["observability"]
+      volumes:
+        - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+        - prometheus-data:/prometheus
+      ports:
+        - "127.0.0.1:9090:9090"
+      restart: unless-stopped
+
+  engine:
+      build:
+        context: .
+        dockerfile: docker/Dockerfile
+        target: runtime
+      image: tick-engine/engine:local
+      profiles: ["prod"]
+      environment:
+        CLICKHOUSE_HOST: clickhouse
+        CLICKHOUSE_PORT: "9000"
+        CLICKHOUSE_USER: ${CLICKHOUSE_USER:-engine}
+        CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      depends_on:
+        clickhouse:
+          condition: service_healthy
+      restart: unless-stopped
+
+volumes:
+  vcpkg-cache:
+  ccache:
+  clickhouse-data:
+  clickhouse-logs:
+  prometheus-data:

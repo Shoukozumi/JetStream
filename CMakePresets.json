@@ -1,0 +1,172 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 25,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkg_installed"
+      }
+    },
+    {
+      "name": "gcc",
+      "hidden": true,
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++"
+      }
+    },
+    {
+      "name": "clang",
+      "hidden": true,
+      "inherits": "base",
+      "description": "Clang using GCC 16's libstdc++, so it is ABI-compatible with the vcpkg dependencies",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_C_FLAGS": "--gcc-toolchain=/usr/local",
+        "CMAKE_CXX_FLAGS": "--gcc-toolchain=/usr/local"
+      }
+    },
+    {
+      "name": "debug",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "release",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "TICK_STATIC_RUNTIME": "ON"
+      }
+    },
+    {
+      "name": "asan",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "TICK_SANITIZER": "address;undefined"
+      }
+    },
+    {
+      "name": "tsan",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "TICK_SANITIZER": "thread"
+      }
+    },
+    {
+      "name": "gcc-debug",
+      "displayName": "GCC Debug",
+      "inherits": [
+        "gcc",
+        "debug"
+      ]
+    },
+    {
+      "name": "gcc-release",
+      "displayName": "GCC Release",
+      "inherits": [
+        "gcc",
+        "release"
+      ]
+    },
+    {
+      "name": "gcc-asan",
+      "displayName": "GCC ASan + UBSan",
+      "inherits": [
+        "gcc",
+        "asan"
+      ]
+    },
+    {
+      "name": "gcc-tsan",
+      "displayName": "GCC TSan",
+      "inherits": [
+        "gcc",
+        "tsan"
+      ]
+    },
+    {
+      "name": "clang-debug",
+      "displayName": "Clang Debug",
+      "inherits": [
+        "clang",
+        "debug"
+      ]
+    },
+    {
+      "name": "clang-release",
+      "displayName": "Clang Release",
+      "inherits": [
+        "clang",
+        "release"
+      ]
+    },
+    {
+      "name": "clang-asan",
+      "displayName": "Clang ASan + UBSan",
+      "inherits": [
+        "clang",
+        "asan"
+      ]
+    },
+    {
+      "name": "clang-tsan",
+      "displayName": "Clang TSan",
+      "inherits": [
+        "clang",
+        "tsan"
+      ]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "gcc-debug",
+      "configurePreset": "gcc-debug"
+    },
+    {
+      "name": "gcc-release",
+      "configurePreset": "gcc-release"
+    },
+    {
+      "name": "gcc-asan",
+      "configurePreset": "gcc-asan"
+    },
+    {
+      "name": "gcc-tsan",
+      "configurePreset": "gcc-tsan"
+    },
+    {
+      "name": "clang-debug",
+      "configurePreset": "clang-debug"
+    },
+    {
+      "name": "clang-release",
+      "configurePreset": "clang-release"
+    },
+    {
+      "name": "clang-asan",
+      "configurePreset": "clang-asan"
+    },
+    {
+      "name": "clang-tsan",
+      "configurePreset": "clang-tsan"
+    }
+  ]
+}
