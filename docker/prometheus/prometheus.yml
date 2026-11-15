@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: tick-engine
+    static_configs:
+      - targets: ["dev:9464", "engine:9464"]

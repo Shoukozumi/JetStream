@@ -1,2 +1,5 @@
-docs/specs/*
-build/*
+build/
+.env
+.cache/
+compile_commands.json
+CMakeUserPresets.json
